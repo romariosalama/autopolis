@@ -62,25 +62,6 @@ Training uses a custom Stable-Baselines3 `VecEnv` where each intersection in eac
 
 For serving, the trained network (19 → 64 → 64 → 2) is exported to plain NumPy (`engine/policy.py`), so the API container doesn't need PyTorch. A test checks the NumPy version picks the same actions as the original model.
 
-## Running it
-
-**With Docker:**
-
-```bash
-docker compose up --build
-# open http://localhost:8080
-```
-
-**Without Docker:**
-
-```bash
-pip install -r requirements.txt
-uvicorn api.main:app --reload          # API on :8000
-
-cd web
-npm install
-npm run dev                            # frontend on :5173, proxies to the API
-```
 
 **Training and benchmarks:**
 
