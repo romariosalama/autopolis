@@ -1,0 +1,13 @@
+6x6 grid, rates [100.0, 150.0] cars/min, 5 seeds, 15 sim-minutes each
+
+fixed timer 10s green   avg wait   39.7s   trips/run    1489
+fixed timer 15s green   avg wait   42.1s   trips/run    1534
+fixed timer 20s green   avg wait   42.0s   trips/run    1563
+fixed timer 30s green   avg wait   51.6s   trips/run    1559
+fixed timer 40s green   avg wait   66.0s   trips/run    1539
+AI (PPO)                avg wait   28.2s   trips/run    1560
+
+vs default 30s timer:      45.3% less waiting
+vs best fixed (10s):      28.9% less waiting
+
+(took 94s)

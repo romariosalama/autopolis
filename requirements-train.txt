@@ -1,0 +1,6 @@
+# extra packages for training the RL agent
+# install PyTorch first: pip install torch --index-url https://download.pytorch.org/whl/cpu
+-r requirements.txt
+gymnasium==1.0.*
+stable-baselines3==2.4.*
+matplotlib>=3.8

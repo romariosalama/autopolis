@@ -1,0 +1,225 @@
+/* The stats panel is styled after a US highway guide sign (green field,
+   white inset border, Overpass, which is based on the Highway Gothic road
+   sign typeface). Everything else stays quiet so the city is the star. */
+
+:root {
+  --sign-green: #006b3f;
+  --sign-white: #f7f7f2;
+  --asphalt: #26292d;
+  --asphalt-2: #34383d;
+  --paint: #e9e5d6;
+  --muted: #a7aaa6;
+  --signal-amber: #ffb81f;
+  --ai-green: #1f9e63;
+  --font: 'Overpass', system-ui, sans-serif;
+  --mono: 'Overpass Mono', ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root, main {
+  margin: 0;
+  height: 100%;
+  background: #b9c4c9;
+  font-family: var(--font);
+  color: var(--paint);
+}
+
+main { position: relative; overflow: hidden; }
+canvas { display: block; touch-action: none; }
+
+/* ---------- the sign ---------- */
+
+.side {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sign {
+  background: var(--sign-green);
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 10px 30px rgba(20, 30, 25, 0.35);
+}
+
+.sign-inner {
+  border: 3px solid var(--sign-white);
+  border-radius: 8px;
+  padding: 14px 18px 12px;
+  color: var(--sign-white);
+}
+
+.sign h1 {
+  margin: 0 0 10px;
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.01em;
+}
+
+.sign dl { margin: 0; display: grid; gap: 6px; }
+
+.sign dl div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  border-top: 1px solid rgba(247, 247, 242, 0.25);
+  padding-top: 6px;
+}
+
+.sign dt { font-size: 15px; font-weight: 400; }
+
+.sign dd {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.sign dd small { font-size: 14px; font-weight: 600; margin-left: 2px; }
+
+.sign-note { margin: 0; font-size: 15px; line-height: 1.4; }
+
+.sign-foot {
+  margin: 10px 0 0;
+  font-size: 13px;
+  opacity: 0.85;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--signal-amber);
+}
+.dot.live { background: #7dffb3; }
+
+/* ---------- wait chart ---------- */
+
+.chart-panel {
+  background: var(--asphalt);
+  border-radius: 10px;
+  padding: 12px 14px 10px;
+  box-shadow: 0 10px 30px rgba(20, 25, 30, 0.35);
+}
+
+.chart-panel h2 {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.chart-wrap { position: relative; }
+.chart-wrap svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+.ai-band { fill: var(--ai-green); opacity: 0.45; }
+.grid { stroke: rgba(233, 229, 214, 0.12); stroke-width: 1; }
+.tick { fill: var(--muted); font: 500 11px var(--font); }
+.wait-line { fill: none; stroke: var(--paint); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.crosshair { stroke: rgba(233, 229, 214, 0.4); stroke-width: 1; }
+.hover-dot { fill: var(--paint); stroke: var(--asphalt); stroke-width: 2; }
+
+.readout { color: var(--paint); font-weight: 600; }
+
+.chart-empty, .chart-note {
+  margin: 6px 0 0;
+  font-size: 12.5px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatch {
+  width: 12px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--ai-green);
+  opacity: 0.8;
+}
+
+/* ---------- controls ---------- */
+
+.controls {
+  position: absolute;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 18px;
+  padding: 10px 14px;
+  background: var(--asphalt);
+  border-radius: 10px;
+  width: max-content;
+  max-width: calc(100% - 32px);
+  box-shadow: 0 10px 30px rgba(20, 25, 30, 0.35);
+}
+
+.group { display: flex; align-items: center; gap: 4px; }
+
+.label { font-size: 13px; color: var(--muted); margin-right: 4px; }
+
+button {
+  font: 600 14px/1 var(--font);
+  color: var(--paint);
+  background: var(--asphalt-2);
+  border: 0;
+  border-radius: 6px;
+  padding: 9px 12px 7px;
+  cursor: pointer;
+}
+
+button:hover { background: #41464c; }
+
+button.on {
+  background: var(--paint);
+  color: var(--asphalt);
+}
+
+button:focus-visible {
+  outline: 2px solid var(--signal-amber);
+  outline-offset: 2px;
+}
+
+.message {
+  flex-basis: 100%;
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--signal-amber);
+}
+
+/* ---------- small screens ---------- */
+
+@media (max-width: 640px) {
+  .side {
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    gap: 8px;
+  }
+  .chart-panel { padding: 8px 12px; }
+  .chart-panel h2 { display: none; }
+  .chart-wrap svg { max-height: 78px; }
+  .sign h1 { font-size: 24px; }
+  .sign dl { grid-template-columns: 1fr 1fr; column-gap: 14px; row-gap: 4px; }
+  .sign dl div { flex-direction: column; align-items: flex-start; gap: 0; }
+  .sign dd { order: -1; font-size: 22px; line-height: 1.1; }
+  .sign dt { font-size: 12.5px; opacity: 0.9; }
+  .controls {
+    bottom: 12px;
+    gap: 8px 12px;
+    justify-content: center;
+  }
+}
