@@ -75,8 +75,6 @@ python run_terminal.py --size 6        # quick headless run, prints stats
 
 **Tests:** `pytest` (54 tests). CI runs them on every push, builds the frontend, and builds both Docker images.
 
-**Deploying:** `docker-compose.prod.yml` puts Caddy in front for automatic HTTPS. Step-by-step AWS Lightsail instructions are in [DEPLOY.md](DEPLOY.md).
-
 ## Project layout
 
 ```
