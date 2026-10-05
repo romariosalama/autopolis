@@ -57,29 +57,6 @@ For training I wrote a custom Stable-Baselines3 `VecEnv` where every intersectio
 
 The trained network is exported to NumPy (`engine/policy.py`) so the server doesn't need PyTorch installed. There's a test that checks the NumPy version picks the same actions as the original model.
 
-## Running locally
-
-```bash
-pip install -r requirements.txt
-uvicorn api.main:app --reload
-
-cd web
-npm install
-npm run dev
-```
-
-Then open http://localhost:5173. Or run everything with `docker compose up --build` and open http://localhost:8080.
-
-Training and benchmarks need a few more packages:
-
-```bash
-pip install torch --index-url https://download.pytorch.org/whl/cpu
-pip install -r requirements-train.txt
-python train.py --steps 900000
-python benchmark.py
-```
-
-Tests: `pytest` (54 tests). GitHub Actions runs them on every push and also builds the frontend and Docker images.
 
 ## Project structure
 
