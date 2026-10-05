@@ -8,3 +8,9 @@ web/dist/
 *.log
 .env
 runs/
+
+# OS / editor junk
+.DS_Store
+.Rhistory
+.vscode/
+.idea/
