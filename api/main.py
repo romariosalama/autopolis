@@ -214,5 +214,8 @@ def set_lights(body: LightsBody):
 
 @app.post("/api/reset")
 def reset():
+    # start a fresh city but keep whichever lights the viewer had picked
+    mode = runner.sim.light_mode
     runner.reset()
+    runner.sim.set_light_mode(mode)
     return {"ok": True}

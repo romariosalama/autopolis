@@ -147,3 +147,19 @@ def test_gridlocked_city_resets_itself():
     runner.advance(0.5)
     assert runner.sim is not old_sim
     assert runner.sim.time < 1.0
+
+
+def test_reset_keeps_light_mode(client):
+    import os
+    from api.main import MODEL_PATH
+    if not os.path.exists(MODEL_PATH):
+        pytest.skip("no trained model")
+    from engine.control import AIController
+    from engine.policy import NumpyPolicy
+    runner.ai_policy = AIController(NumpyPolicy(MODEL_PATH))
+    client.post("/api/lights", json={"mode": "ai"})
+    runner.advance(1.0)
+    client.post("/api/reset")
+    assert runner.sim.light_mode == "ai"
+    assert runner.sim.time == 0
+    client.post("/api/lights", json={"mode": "fixed"})

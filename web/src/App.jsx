@@ -64,6 +64,7 @@ function Controls({ stats, controls }) {
         <button onClick={() => run(controls.paused ? 'resume' : 'pause')}>
           {controls.paused ? 'Resume' : 'Pause'}
         </button>
+        <button onClick={() => run('reset')}>Reset city</button>
       </div>
 
       <div className="group" role="radiogroup" aria-label="Simulation speed">
