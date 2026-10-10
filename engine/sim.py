@@ -19,6 +19,9 @@ LANE_OFFSET = 2.5          # meters to the right of the road center line
 HARD_GAP = 0.5             # cars are never closer than this, no matter what
 STOP_LINE = 1.0            # meters before the intersection where cars stop
 STATS_WINDOW = 60.0        # seconds, for "cars per minute"
+MAX_GATE_QUEUE = 10        # cars waiting at one entrance; extra spawns are dropped
+GRIDLOCK_SECONDS = 120.0   # no trip finished for this long (with cars on the road) = gridlock
+RUSH_HOUR_SECONDS = 300.0  # rush hour switches itself off after this much sim time
 
 
 class Simulation:
@@ -32,6 +35,7 @@ class Simulation:
         self.tick_count = 0
         self.spawn_rate = spawn_rate
         self.rush_hour = False
+        self.rush_hour_until = 0.0
         self.light_mode = light_mode
 
         self.lights = {}
@@ -49,6 +53,7 @@ class Simulation:
 
         # stats
         self.trips_completed = 0
+        self.last_trip_time = 0.0
         self.total_wait_completed = 0.0
         self.total_travel_completed = 0.0
         self.recent_finishes = deque()   # (time, wait_time)
@@ -56,7 +61,8 @@ class Simulation:
     # ---------- spawning ----------
 
     def current_spawn_rate(self):
-        return self.spawn_rate * (2.5 if self.rush_hour else 1.0)
+        # 1.2x keeps the 6x6 demo city just under the point where it gridlocks
+        return self.spawn_rate * (1.2 if self.rush_hour else 1.0)
 
     def _random_route(self, start_gate):
         goal = self.rng.choice([g for g in self.city.gates if g != start_gate])
@@ -69,6 +75,8 @@ class Simulation:
         """Adds a car to a gate's waiting queue. It enters when there's room."""
         if gate is None:
             gate = self.rng.choice(self.city.gates)
+        if len(self.spawn_queues[gate]) >= MAX_GATE_QUEUE:
+            return None   # entrance is backed up, so this car never shows up
         route = self._random_route(gate)
         if route is None or len(route) < 2:
             return None
@@ -112,6 +120,8 @@ class Simulation:
 
     def step(self):
         dt = self.dt
+        if self.rush_hour and self.time >= self.rush_hour_until:
+            self.rush_hour = False
         for light in self.lights.values():
             light.step(dt, self.light_mode)
 
@@ -232,11 +242,20 @@ class Simulation:
     def _finish_trip(self, car):
         del self.cars[car.id]
         self.trips_completed += 1
+        self.last_trip_time = self.time
         self.total_wait_completed += car.wait_time
         self.total_travel_completed += self.time - car.spawn_time
         self.recent_finishes.append((self.time, car.wait_time))
 
     # ---------- controls ----------
+
+    def set_rush_hour(self, on):
+        self.rush_hour = on
+        self.rush_hour_until = self.time + RUSH_HOUR_SECONDS if on else 0.0
+
+    def is_gridlocked(self):
+        """Cars are on the road but nobody has finished a trip in a long time."""
+        return len(self.cars) > 0 and self.time - self.last_trip_time > GRIDLOCK_SECONDS
 
     def set_light_mode(self, mode):
         assert mode in ("fixed", "ai")

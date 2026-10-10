@@ -257,3 +257,29 @@ def test_city_layout_lists_each_road_once():
     sim = Simulation(3, 3)
     layout = sim.city_layout()
     assert len(layout["roads"]) == len(sim.city.edges) // 2
+
+
+def test_gate_queue_is_capped():
+    from engine.sim import MAX_GATE_QUEUE
+    sim = Simulation(3, 3, seed=0, spawn_rate=0)
+    gate = sim.city.gates[0]
+    for _ in range(MAX_GATE_QUEUE + 50):
+        sim.spawn_car(gate)
+    assert len(sim.spawn_queues[gate]) == MAX_GATE_QUEUE
+
+
+def test_gridlock_detected_when_no_trips_finish():
+    from engine.sim import GRIDLOCK_SECONDS
+    sim = Simulation(3, 3, seed=0, spawn_rate=30)
+    sim.run(60)
+    assert not sim.is_gridlocked()
+    sim.last_trip_time = sim.time - GRIDLOCK_SECONDS - 1
+    assert sim.is_gridlocked()
+
+
+def test_rush_hour_turns_itself_off():
+    from engine.sim import RUSH_HOUR_SECONDS
+    sim = Simulation(3, 3, seed=0)
+    sim.set_rush_hour(True)
+    sim.run(RUSH_HOUR_SECONDS + 5)
+    assert not sim.rush_hour

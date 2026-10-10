@@ -136,3 +136,14 @@ def test_reset_clears_history(client):
     runner._take_sample()
     client.post("/api/reset")
     assert runner.history == []
+
+
+def test_gridlocked_city_resets_itself():
+    runner.reset()
+    runner.sim.set_light_mode("fixed")
+    runner.advance(0.5)
+    runner.sim.last_trip_time = -1000   # pretend nothing has finished in ages
+    old_sim = runner.sim
+    runner.advance(0.5)
+    assert runner.sim is not old_sim
+    assert runner.sim.time < 1.0

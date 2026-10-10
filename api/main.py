@@ -56,6 +56,12 @@ class SimRunner:
                 self.ai_policy(self.sim)
             self.sim.step()
             self._sim_time_owed -= self.sim.dt
+            if self.sim.is_gridlocked():
+                # the city jammed itself up; start a fresh one with the same light mode
+                mode = self.sim.light_mode
+                self.reset()
+                self.sim.set_light_mode(mode)
+                return
             if self.sim.time >= self._next_sample:
                 self._take_sample()
 
@@ -192,7 +198,7 @@ def spawn(body: SpawnBody):
 
 @app.post("/api/rush-hour")
 def rush_hour(body: ToggleBody):
-    runner.sim.rush_hour = body.on
+    runner.sim.set_rush_hour(body.on)
     return {"rush_hour": body.on}
 
 
